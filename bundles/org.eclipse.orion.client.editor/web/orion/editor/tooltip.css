@@ -18,7 +18,8 @@
 	border: 1px solid black;
 	z-index: 100;
 	position: fixed;
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 .textviewTooltip em {
@@ -47,4 +48,8 @@
 
 .tooltipTheme .annotationLine.currentLine {
 	background-color: transparent !important;
+}
+
+.textviewTooltip .dropdownCommandName {
+	color: #1712C0;
 }

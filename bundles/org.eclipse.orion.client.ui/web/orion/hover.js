@@ -45,19 +45,32 @@ define ([
 		},
 				
 		renderQuickFixes: function(annotation, parentDiv) {
-			if  (!annotation || !parentDiv)
+			if  (!annotation || !parentDiv){
 				return;
+			}
 
-			var qfToolbar = document.createElement("span");
-			var actions = document.createElement("ul"); //$NON-NLS-0$
-			actions.className = "commandList layoutRight"; //$NON-NLS-0$
-			qfToolbar.appendChild(actions);
-			parentDiv.appendChild(qfToolbar);
-			
+			var actionsDiv = document.createElement("div"); //$NON-NLS-0$
+			actionsDiv.className = "commandList"; //$NON-NLS-0$
 			var metadata = this.inputManager.getFileMetadata();
 			metadata.annotation = annotation;
-			this.commandRegistry.renderCommands("orion.edit.quickfix", actions, metadata, this.editor, 'tool', annotation); //$NON-NLS-1$ //$NON-NLS-0$
+			var nodeList = [];
+			this.commandRegistry.renderCommands("orion.edit.quickfix", actionsDiv, metadata, this.editor, 'quickfix', annotation, nodeList); //$NON-NLS-1$ //$NON-NLS-0$
 			delete metadata.annotation;
+			
+			if (nodeList.length > 0){
+				var hr = document.createElement("hr"); //$NON-NLS-0$
+				hr.style.borderStyle = "solid"; //$NON-NLS-0$
+				hr.style.borderWidth = "1px 0 0 0"; //$NON-NLS-0$
+				var descriptionDiv = document.createElement("div"); //$NON-NLS-0$
+				descriptionDiv.style.marginLeft = '5px'; //$NON-NLS-0$
+				descriptionDiv.style.marginTop = '5px'; //$NON-NLS-0$
+				descriptionDiv.style.marginBottom = '5px'; //$NON-NLS-0$
+				descriptionDiv.style.fontFamily = "";
+				descriptionDiv.textContent = nodeList.length + " quick fixes available:"; // TODO NLS and have plural/singular text
+				parentDiv.appendChild(hr);
+				parentDiv.appendChild(descriptionDiv);
+				parentDiv.appendChild(actionsDiv);
+			}			
 		}
 
 	};

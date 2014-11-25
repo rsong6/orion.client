@@ -242,16 +242,21 @@ define("orion/editor/tooltip", [ //$NON-NLS-0$
 			var tooltipDoc = tooltipDiv.ownerDocument;
 			var documentElement = tooltipDoc.documentElement;
 			
+			var hasProblemAnnotations = false;
+			var contents = info.contents;
+			if (contents instanceof Array) {
+				if (contents.length > 0){
+					hasProblemAnnotations = true;
+				}
+				contents = this._getAnnotationContents(contents);			
+			}
+			
 			var hoverInfo;
-			if (this.hover && info.offset !== undefined) {
+			if (!hasProblemAnnotations && this.hover && info.offset !== undefined) {
 				var context = {offset: info.offset};
 				hoverInfo = this.hover.computeHoverInfo(context);
 			}
 			
-			var contents = info.contents;
-			if (contents instanceof Array) {
-				contents = this._getAnnotationContents(contents);			
-			}
 			if (typeof contents === "string") { //$NON-NLS-0$
 				tooltipContents.innerHTML = contents;
 			} else if (this._isNode(contents)) {
@@ -494,16 +499,16 @@ define("orion/editor/tooltip", [ //$NON-NLS-0$
 				}
 				result.appendChild(title);
 				
-				// Handle quick fixes
-				if (self.hover) {
-					self.hover.renderQuickFixes(annotation, result);
-				}
 				return result;
 			}
 			if (annotations.length === 1) {
 				annotation = annotations[0];
 				if (annotation.title !== undefined) {
 					html = getAnnotationHTML(annotation);
+					// Handle quick fixes
+					if (self.hover) {
+						self.hover.renderQuickFixes(annotation, html);
+					}
 					if (html.firstChild) {
 						var className = html.firstChild.className;
 						if (className) { className += " "; } //$NON-NLS-0$
@@ -525,15 +530,19 @@ define("orion/editor/tooltip", [ //$NON-NLS-0$
 				}
 			} else {
 				var tooltipHTML = util.createElement(document, "div"); //$NON-NLS-0$
-				var em = util.createElement(document, "em"); //$NON-NLS-0$
-				em.appendChild(document.createTextNode(messages.multipleAnnotations));
-				tooltipHTML.appendChild(em);
+//				var em = util.createElement(document, "em"); //$NON-NLS-0$
+//				em.appendChild(document.createTextNode(messages.multipleAnnotations));
+//				tooltipHTML.appendChild(em);
 				for (var i = 0; i < annotations.length; i++) {
 					annotation = annotations[i];
 					html = getAnnotationHTML(annotation);
 					if (html) {
 						tooltipHTML.appendChild(html);
 					}
+				}
+				// TODO Provide quick fixes for only the first annotation, we should sort the annotations to put any problem markers first
+				if (self.hover) {
+					self.hover.renderQuickFixes(annotations[0], tooltipHTML);
 				}
 				return tooltipHTML;
 			}
